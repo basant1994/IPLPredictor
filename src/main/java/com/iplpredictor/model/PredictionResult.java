@@ -7,4 +7,5 @@ import java.util.List;
 @Data
 public class PredictionResult {
     List<MatchResult> result;
+    PointsTable pointsTable;
 }
