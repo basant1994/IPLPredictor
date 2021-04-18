@@ -22,18 +22,17 @@ public class PredictionController {
     @RequestMapping(method = RequestMethod.GET, path = "/schedule")
     public Schedule getMatches() {
         return predictionService.getSchedule(System.currentTimeMillis());
-
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "/predictPlayOff")
     public PredictionResult predict(@RequestBody Map<String, Object> team) {
-        String teamId = team.get("teamId").toString();
+        int teamId = (int) team.get("teamId");
         PredictionResult result = predictionService.predictResult(teamId);
         return result;
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "/teamPredictionCounts")
-    public Map<String, Object> getPredictionCounts() {
+    public Map<Integer, Object> getPredictionCounts() {
         return predictionService.getPredictionCounts();
     }
 
@@ -55,4 +54,11 @@ public class PredictionController {
         int matchId = (int) pollData.get("matchId");
         return this.predictionService.getPollData(matchId);
     }
+
+
+    @RequestMapping(method = RequestMethod.GET, path = "/matches")
+    public List<Match> getAllMatches() {
+        return this.predictionService.getAllMatches();
+    }
+
 }

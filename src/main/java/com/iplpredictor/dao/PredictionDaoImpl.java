@@ -22,7 +22,7 @@ public class PredictionDaoImpl implements PredictionDao {
     }
 
     @Override
-    public boolean updatePredictionCount(String teamId) {
+    public boolean updatePredictionCount(int teamId) {
         Map<String, Object> param = new HashMap<>();
         param.put("id", teamId);
         int rowCount = this.template.update("update prediction_counts set count = count + 1 where id = :id", param);
@@ -31,7 +31,7 @@ public class PredictionDaoImpl implements PredictionDao {
 
     @Override
     public Schedule getSchedule(long startTime) {
-        List<Match> matches = template.query("select * from matches", new MatchMapper());
+        List<Match> matches = template.query("select * from matches order by id", new MatchMapper());
         Schedule sch = new Schedule();
         sch.setMatchList(matches);
         return sch;
@@ -78,6 +78,11 @@ public class PredictionDaoImpl implements PredictionDao {
         params.put("matchId", matchId);
         List<MatchPoll> matchPolls = this.template.query("select * from matchPoll where matchId = :matchId", params, new MatchPollMapper());
         return matchPolls.get(0);
+    }
+
+    @Override
+    public List<Match> getAllMatches() {
+        return template.query("select * from matches order by id", new HashMap<>(), new MatchMapper());
     }
 
 }
