@@ -8,10 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 public interface PredictionDao {
-    boolean updatePredictionCount(String teamId);
+    boolean updatePredictionCount(int teamId);
     Schedule getSchedule(long startTime);
     List<Map<String,Object>> getPredictionCounts();
     List<Match> getNextMatch(long dayNum);
     boolean updatePoll(int matchId, int teamId);
     MatchPoll getPollData(int matchId);
+    List<Match> getAllMatches();
 }

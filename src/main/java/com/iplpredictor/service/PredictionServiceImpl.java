@@ -6,6 +6,7 @@ import com.iplpredictor.model.Match;
 import com.iplpredictor.model.MatchPoll;
 import com.iplpredictor.model.PredictionResult;
 import com.iplpredictor.model.Schedule;
+import com.iplpredictor.util.PredictionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -32,9 +33,13 @@ public class PredictionServiceImpl implements PredictionService{
     private PredictionDao predictionDao;
 
     @Override
-    public PredictionResult predictResult(String teamId) {
+    public PredictionResult predictResult(int teamId) {
+        List<Match> allMatches = this.predictionDao.getAllMatches();
+        Match[] matchArray = Arrays.copyOf(allMatches.toArray(), 56 , Match[].class);
+        PredictionUtil predictionUtil = new PredictionUtil(matchArray);
+        PredictionResult predictionResult  = predictionUtil.predict(teamId);
         this.predictionDao.updatePredictionCount(teamId);
-        return new PredictionResult();
+        return predictionResult;
     }
 
     @Override
@@ -43,10 +48,10 @@ public class PredictionServiceImpl implements PredictionService{
     }
 
     @Override
-    public Map<String, Object> getPredictionCounts() {
+    public Map<Integer, Object> getPredictionCounts() {
         List<Map<String, Object>> predictionCounts = predictionDao.getPredictionCounts();
-        Map<String, Object> teamPredictionCount = predictionCounts.stream()
-                .collect(Collectors.toMap(e -> e.get("id").toString(), e -> e.get("count")));
+        Map<Integer, Object> teamPredictionCount = predictionCounts.stream()
+                .collect(Collectors.toMap(e -> (int) e.get("id"), e -> e.get("count")));
         return teamPredictionCount;
     }
 
@@ -72,6 +77,11 @@ public class PredictionServiceImpl implements PredictionService{
     @Override
     public MatchPoll getPollData(int matchId) {
         return this.predictionDao.getPollData(matchId);
+    }
+
+    @Override
+    public List<Match> getAllMatches() {
+        return this.predictionDao.getAllMatches();
     }
 
 

@@ -2,57 +2,76 @@ package com.iplpredictor.model;
 
 public class TeamStat {
     private final int id;
-    int noOfMatchesPlayed;
-    int noOfMatchesWon;
-    int noOfMatchesLost;
-    int noOfMatchesTied;
-    int points;
-    int netRunRate;
+    public int noOfMatches;
+    public int noOfWins;
+    public int noOfDefeats;
+    public int noOfMatchesWithNR;
+    public int points;
+    public int netRunRate;
+    public TeamStat teamStat;
 
-    TeamStat(int id) {
+    public TeamStat(int id) {
         this.id = id;
-        noOfMatchesPlayed = 0;
-        noOfMatchesWon = 0;
-        noOfMatchesLost = 0;
-        noOfMatchesTied = 0;
+        noOfMatches = 0;
+        noOfWins = 0;
+        noOfDefeats = 0;
+        noOfMatchesWithNR = 0;
         points = 0;
         netRunRate = 0;
+    }
+
+    public TeamStat(TeamStat teamStat) {
+        this.teamStat = teamStat;
+        id = teamStat.id;
+    }
+
+    public void setTeamStat(TeamStat teamStat) {
+        this.teamStat = teamStat;
+    }
+
+    public void reset() {
+        noOfMatches = teamStat.noOfMatches;
+        noOfWins = teamStat.noOfWins;
+        noOfDefeats = teamStat.noOfDefeats;
+        noOfMatchesWithNR = teamStat.noOfMatchesWithNR;
+        points = teamStat.points;
+        netRunRate = teamStat.netRunRate;
     }
 
     public int getId() {
         return id;
     }
 
-    public int getNoOfMatchesPlayed() {
-        return noOfMatchesPlayed;
+    public int getNoOfMatches() {
+        return noOfMatches;
     }
 
-    public void updateNoOfMatchesPlayed() {
-        this.noOfMatchesPlayed += 1;
+    public void setNoOfMatches(int noOfMatches) {
+        this.noOfMatches = noOfMatches;
     }
 
-    public int getNoOfMatchesWon() {
-        return noOfMatchesWon;
+    public int getNoOfWins() {
+        return noOfWins;
     }
 
-    public void updateNoOfMatchesWon() {
-        this.noOfMatchesWon += 1;
+    public void setNoOfWins(int noOfWins) {
+        this.noOfWins = noOfWins;
     }
 
-    public int getNoOfMatchesLost() {
-        return noOfMatchesLost;
+    public int getNoOfDefeats() {
+        return noOfDefeats;
     }
 
-    public void updateNoOfMatchesLost() {
-        this.noOfMatchesLost += 1;
+    public void setNoOfDefeats(int noOfDefeats) {
+        this.noOfDefeats = noOfDefeats;
     }
 
-    public int getNoOfMatchesTied() {
-        return noOfMatchesTied;
+    public int getNoOfMatchesWithNR() {
+        return noOfMatchesWithNR;
     }
 
-    public void updateNoOfMatchesTied() {
-        this.noOfMatchesTied += 1;
+    public void setNoOfMatchesWithNR(int noOfMatchesWithNR) {
+        this.noOfMatchesWithNR = noOfMatchesWithNR;
     }
 
     public int getPoints() {
@@ -60,7 +79,7 @@ public class TeamStat {
     }
 
     public void updatePoints() {
-        this.points = 2 * this.noOfMatchesWon + this.noOfMatchesTied;
+        this.points = 2 * noOfWins + noOfMatchesWithNR;
     }
 
     public int getNetRunRate() {
@@ -69,5 +88,19 @@ public class TeamStat {
 
     public void setNetRunRate(int netRunRate) {
         this.netRunRate = netRunRate;
+    }
+
+    @Override
+    public String toString() {
+        updatePoints();
+        return "TeamStat{" +
+                "id=" + id +
+                ", noOfMatches=" + noOfMatches +
+                ", noOfWins=" + noOfWins +
+                ", noOfDefeats=" + noOfDefeats +
+                ", noOfMatchesWithNR=" + noOfMatchesWithNR +
+                ", points=" + points +
+                ", netRunRate=" + netRunRate +
+                '}';
     }
 }

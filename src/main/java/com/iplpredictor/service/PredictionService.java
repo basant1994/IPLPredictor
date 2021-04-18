@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.Map;
 
 public interface PredictionService {
-    PredictionResult predictResult(String teamName);
+    PredictionResult predictResult(int teamId);
     Schedule getSchedule(long startTime);
-    Map<String,Object> getPredictionCounts();
+    Map<Integer,Object> getPredictionCounts();
     List<Match> getNextMatch();
     boolean poll(int matchId, int teamId);
     MatchPoll getPollData(int matchId);
-
+    List<Match> getAllMatches();
 
 }
