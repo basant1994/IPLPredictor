@@ -2,12 +2,12 @@ package com.iplpredictor.dao;
 
 import com.iplpredictor.mapper.MatchMapper;
 import com.iplpredictor.mapper.MatchPollMapper;
-import com.iplpredictor.model.Match;
-import com.iplpredictor.model.MatchPoll;
-import com.iplpredictor.model.Schedule;
+import com.iplpredictor.mapper.PointsTableMapper;
+import com.iplpredictor.model.*;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +83,15 @@ public class PredictionDaoImpl implements PredictionDao {
     @Override
     public List<Match> getAllMatches() {
         return template.query("select * from matches order by id", new HashMap<>(), new MatchMapper());
+    }
+
+    @Override
+    public PointsTable getPointsTable() {
+        List<TeamStat> teamStats = template.query("select * from points_table", new HashMap<>(), new PointsTableMapper());
+        PointsTable pointsTable = new PointsTable();
+        TeamStat[] teamStatsArr = Arrays.copyOf(teamStats.toArray(), 8 , TeamStat[].class);
+        pointsTable.setTeamStats(teamStatsArr);
+        return pointsTable;
     }
 
 }

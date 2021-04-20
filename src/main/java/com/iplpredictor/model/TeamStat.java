@@ -7,7 +7,7 @@ public class TeamStat {
     public int noOfDefeats;
     public int noOfMatchesWithNR;
     public int points;
-    public int netRunRate;
+    public float netRunRate;
     public TeamStat teamStat;
 
     public TeamStat(int id) {
@@ -82,11 +82,15 @@ public class TeamStat {
         this.points = 2 * noOfWins + noOfMatchesWithNR;
     }
 
-    public int getNetRunRate() {
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+    public float getNetRunRate() {
         return netRunRate;
     }
 
-    public void setNetRunRate(int netRunRate) {
+    public void setNetRunRate(float netRunRate) {
         this.netRunRate = netRunRate;
     }
 
