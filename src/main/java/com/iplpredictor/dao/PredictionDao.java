@@ -2,6 +2,7 @@ package com.iplpredictor.dao;
 
 import com.iplpredictor.model.Match;
 import com.iplpredictor.model.MatchPoll;
+import com.iplpredictor.model.PointsTable;
 import com.iplpredictor.model.Schedule;
 
 import java.util.List;
@@ -15,4 +16,5 @@ public interface PredictionDao {
     boolean updatePoll(int matchId, int teamId);
     MatchPoll getPollData(int matchId);
     List<Match> getAllMatches();
+    PointsTable getPointsTable();
 }

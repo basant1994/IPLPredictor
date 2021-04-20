@@ -61,4 +61,9 @@ public class PredictionController {
         return this.predictionService.getAllMatches();
     }
 
+    @RequestMapping(method = RequestMethod.GET, path = "/pointsTable")
+    public PointsTable getPointsTable() {
+        return this.predictionService.getPointsTable();
+    }
+
 }

@@ -2,10 +2,7 @@ package com.iplpredictor.service;
 
 
 import com.iplpredictor.dao.PredictionDao;
-import com.iplpredictor.model.Match;
-import com.iplpredictor.model.MatchPoll;
-import com.iplpredictor.model.PredictionResult;
-import com.iplpredictor.model.Schedule;
+import com.iplpredictor.model.*;
 import com.iplpredictor.util.PredictionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.LocaleUtils;
@@ -82,6 +79,11 @@ public class PredictionServiceImpl implements PredictionService{
     @Override
     public List<Match> getAllMatches() {
         return this.predictionDao.getAllMatches();
+    }
+
+    @Override
+    public PointsTable getPointsTable() {
+        return this.predictionDao.getPointsTable();
     }
 
 
