@@ -1,6 +1,8 @@
 package com.iplpredictor.model;
 
-public class TeamStat {
+import java.io.Serializable;
+
+public class TeamStat implements Serializable {
     private final int id;
     public int noOfMatches;
     public int noOfWins;
