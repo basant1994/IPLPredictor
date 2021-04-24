@@ -1,11 +1,14 @@
 package com.iplpredictor.model;
 
 import lombok.Data;
+import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
-public class PredictionResult {
+@ToString
+public class PredictionResult implements Serializable {
     Match[] predictedMatchResults;
     PointsTable pointsTable;
     TeamStat[] predictedTeamStats;
