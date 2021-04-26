@@ -27,7 +27,8 @@ public class PredictionServiceImpl implements PredictionService {
     @Override
     public PredictionResult predictResult(int teamId) {
         String key = getTodayKeyWithTeamId(teamId);
-        PredictionResult result = predictionResultCacheManager.getCachedPredictionResult(key);
+        //PredictionResult result = predictionResultCacheManager.getCachedPredictionResult(key);
+        PredictionResult result = null;
         if (Objects.nonNull(result)) {
             return result;
         } else {
@@ -36,7 +37,7 @@ public class PredictionServiceImpl implements PredictionService {
             PredictionUtil predictionUtil = new PredictionUtil(matchArray);
             PredictionResult predictionResult = predictionUtil.predict(teamId);
             this.predictionDao.updatePredictionCount(teamId);
-            predictionResultCacheManager.cachePredictionResult(key, predictionResult);
+            //predictionResultCacheManager.cachePredictionResult(key, predictionResult);
             return predictionResult;
         }
     }
