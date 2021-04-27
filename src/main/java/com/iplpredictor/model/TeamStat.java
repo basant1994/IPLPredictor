@@ -12,6 +12,10 @@ public class TeamStat implements Serializable {
     public float netRunRate;
     public TeamStat teamStat;
 
+    public TeamStat() {
+        this.id = -1;
+    }
+
     public TeamStat(int id) {
         this.id = id;
         noOfMatches = 0;

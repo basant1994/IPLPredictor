@@ -18,4 +18,8 @@ public class PredictionResult implements Serializable {
         this.predictedMatchResults = predictedMatchResults;
         this.predictedTeamStats = predictedTeamStats;
     }
+
+    public PredictionResult() {
+
+    }
 }

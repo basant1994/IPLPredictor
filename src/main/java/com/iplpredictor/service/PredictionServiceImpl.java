@@ -1,12 +1,14 @@
 package com.iplpredictor.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iplpredictor.dao.PredictionDao;
 import com.iplpredictor.model.*;
 import com.iplpredictor.util.PredictionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -24,22 +26,37 @@ public class PredictionServiceImpl implements PredictionService {
     @Autowired
     private PredictionResultCacheManager predictionResultCacheManager;
 
+    @Autowired
+    private Jedis jedis;
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     public PredictionResult predictResult(int teamId) {
-        String key = getTodayKeyWithTeamId(teamId);
-        //PredictionResult result = predictionResultCacheManager.getCachedPredictionResult(key);
-        PredictionResult result = null;
-        if (Objects.nonNull(result)) {
-            return result;
-        } else {
-            List<Match> allMatches = this.predictionDao.getAllMatches();
-            Match[] matchArray = Arrays.copyOf(allMatches.toArray(), 56, Match[].class);
-            PredictionUtil predictionUtil = new PredictionUtil(matchArray);
-            PredictionResult predictionResult = predictionUtil.predict(teamId);
-            this.predictionDao.updatePredictionCount(teamId);
-            //predictionResultCacheManager.cachePredictionResult(key, predictionResult);
-            return predictionResult;
+        try {
+            String key = getTodayKeyWithTeamId(teamId);
+            //PredictionResult result = predictionResultCacheManager.getCachedPredictionResult(key);
+            String resultStr = jedis.get(key);
+            ///PredictionResult result = null;
+            if (Objects.nonNull(resultStr)) {
+                PredictionResult result = objectMapper.readValue(resultStr, PredictionResult.class);
+                return result;
+            } else {
+                List<Match> allMatches = this.predictionDao.getAllMatches();
+                Match[] matchArray = Arrays.copyOf(allMatches.toArray(), 56, Match[].class);
+                PredictionUtil predictionUtil = new PredictionUtil(matchArray);
+                PredictionResult predictionResult = predictionUtil.predict(teamId);
+                this.predictionDao.updatePredictionCount(teamId);
+                String str = objectMapper.writeValueAsString(predictionResult);
+                jedis.set(key, str);
+                //predictionResultCacheManager.cachePredictionResult(key, predictionResult);
+                return predictionResult;
+            }
         }
+        catch (Exception e) {
+            log.error("exception ...", e);
+        }
+        return new PredictionResult();
     }
 
     @Override

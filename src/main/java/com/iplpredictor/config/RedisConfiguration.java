@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericToStringSerializer;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import redis.clients.jedis.Jedis;
 
 @Configuration
 public class RedisConfiguration {
@@ -18,6 +19,16 @@ public class RedisConfiguration {
     private String REDIS_HOSTNAME;
     @Value("${spring.redis.port}")
     private int REDIS_PORT;
+
+
+    @Value("${jedis.host}")
+    private String JEDIS_HOSTNAME;
+
+    @Value("${jedis.port}")
+    private int JEDIS_PORT;
+
+    @Value("${jedis.secret}")
+    private String JEDIS_SECRET;
 
     @Bean
     protected JedisConnectionFactory jedisConnectionFactory() {
@@ -39,5 +50,13 @@ public class RedisConfiguration {
         return redisTemplate;
     }
 
+
+    @Bean
+    public Jedis jedis()
+    {
+        Jedis jedis = new Jedis(JEDIS_HOSTNAME, JEDIS_PORT);
+        jedis.auth(JEDIS_SECRET);
+        return jedis;
+    }
 
 }
