@@ -40,8 +40,11 @@ public class PredictionServiceImpl implements PredictionService {
             ///PredictionResult result = null;
             if (Objects.nonNull(resultStr)) {
                 PredictionResult result = objectMapper.readValue(resultStr, PredictionResult.class);
+                log.info("Got prediction results from cache...");
+                this.predictionDao.updatePredictionCount(teamId);
                 return result;
             } else {
+                log.info("Calculating prediction results...");
                 List<Match> allMatches = this.predictionDao.getAllMatches();
                 Match[] matchArray = Arrays.copyOf(allMatches.toArray(), 56, Match[].class);
                 PredictionUtil predictionUtil = new PredictionUtil(matchArray);
