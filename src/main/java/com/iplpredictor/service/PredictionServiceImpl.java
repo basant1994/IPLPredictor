@@ -9,6 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.params.Params;
+import redis.clients.jedis.params.SetParams;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -27,12 +30,13 @@ public class PredictionServiceImpl implements PredictionService {
     private PredictionResultCacheManager predictionResultCacheManager;
 
     @Autowired
-    private Jedis jedis;
+    private JedisPool jedisPool;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public PredictionResult predictResult(int teamId) {
+        Jedis jedis = jedisPool.getResource();
         try {
             String key = getTodayKeyWithTeamId(teamId);
             //PredictionResult result = predictionResultCacheManager.getCachedPredictionResult(key);
@@ -51,7 +55,7 @@ public class PredictionServiceImpl implements PredictionService {
                 PredictionResult predictionResult = predictionUtil.predict(teamId);
                 this.predictionDao.updatePredictionCount(teamId);
                 String str = objectMapper.writeValueAsString(predictionResult);
-                jedis.set(key, str);
+                jedis.set(key, str, getTimeoutParams());
                 //predictionResultCacheManager.cachePredictionResult(key, predictionResult);
                 return predictionResult;
             }
@@ -115,4 +119,9 @@ public class PredictionServiceImpl implements PredictionService {
         return teamId + "_" + date;
     }
 
+    private SetParams getTimeoutParams() {
+        SetParams params = new SetParams();
+        params.ex(24*60);
+        return params;
+    }
 }
