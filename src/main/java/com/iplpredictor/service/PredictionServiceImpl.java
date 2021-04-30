@@ -36,9 +36,10 @@ public class PredictionServiceImpl implements PredictionService {
 
     @Override
     public PredictionResult predictResult(int teamId) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = null;
         try {
             String key = getTodayKeyWithTeamId(teamId);
+            jedis = jedisPool.getResource();
             //PredictionResult result = predictionResultCacheManager.getCachedPredictionResult(key);
             String resultStr = jedis.get(key);
             ///PredictionResult result = null;
@@ -62,6 +63,11 @@ public class PredictionServiceImpl implements PredictionService {
         }
         catch (Exception e) {
             log.error("exception ...", e);
+        }
+        finally {
+            if(Objects.nonNull(jedis)) {
+                jedis.close();
+            }
         }
         return new PredictionResult();
     }
