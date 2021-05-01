@@ -1,12 +1,17 @@
 package com.iplpredictor.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iplpredictor.dao.PredictionDao;
 import com.iplpredictor.model.*;
 import com.iplpredictor.util.PredictionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.params.Params;
+import redis.clients.jedis.params.SetParams;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -24,21 +29,47 @@ public class PredictionServiceImpl implements PredictionService {
     @Autowired
     private PredictionResultCacheManager predictionResultCacheManager;
 
+    @Autowired
+    private JedisPool jedisPool;
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     public PredictionResult predictResult(int teamId) {
-        String key = getTodayKeyWithTeamId(teamId);
-        PredictionResult result = predictionResultCacheManager.getCachedPredictionResult(key);
-        if (Objects.nonNull(result)) {
-            return result;
-        } else {
-            List<Match> allMatches = this.predictionDao.getAllMatches();
-            Match[] matchArray = Arrays.copyOf(allMatches.toArray(), 56, Match[].class);
-            PredictionUtil predictionUtil = new PredictionUtil(matchArray);
-            PredictionResult predictionResult = predictionUtil.predict(teamId);
-            this.predictionDao.updatePredictionCount(teamId);
-            predictionResultCacheManager.cachePredictionResult(key, predictionResult);
-            return predictionResult;
+        Jedis jedis = null;
+        try {
+            String key = getTodayKeyWithTeamId(teamId);
+            jedis = jedisPool.getResource();
+            //PredictionResult result = predictionResultCacheManager.getCachedPredictionResult(key);
+            String resultStr = jedis.get(key);
+            ///PredictionResult result = null;
+            if (Objects.nonNull(resultStr)) {
+                PredictionResult result = objectMapper.readValue(resultStr, PredictionResult.class);
+                log.info("Got prediction results from cache...");
+                this.predictionDao.updatePredictionCount(teamId);
+                return result;
+            } else {
+                log.info("Calculating prediction results...");
+                List<Match> allMatches = this.predictionDao.getAllMatches();
+                Match[] matchArray = Arrays.copyOf(allMatches.toArray(), 56, Match[].class);
+                PredictionUtil predictionUtil = new PredictionUtil(matchArray);
+                PredictionResult predictionResult = predictionUtil.predict(teamId);
+                this.predictionDao.updatePredictionCount(teamId);
+                String str = objectMapper.writeValueAsString(predictionResult);
+                jedis.set(key, str, getTimeoutParams());
+                //predictionResultCacheManager.cachePredictionResult(key, predictionResult);
+                return predictionResult;
+            }
         }
+        catch (Exception e) {
+            log.error("exception ...", e);
+        }
+        finally {
+            if(Objects.nonNull(jedis)) {
+                jedis.close();
+            }
+        }
+        return new PredictionResult();
     }
 
     @Override
@@ -94,4 +125,9 @@ public class PredictionServiceImpl implements PredictionService {
         return teamId + "_" + date;
     }
 
+    private SetParams getTimeoutParams() {
+        SetParams params = new SetParams();
+        params.ex(24*60);
+        return params;
+    }
 }
